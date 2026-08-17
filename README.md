@@ -20,6 +20,11 @@ src/main/resources/db/     Flyway migrations V1-V30
 compose.yaml               MySQL + MinIO + backend + frontend
 ```
 
+Frontend được chia theo trách nhiệm: `app/` chứa shell và route guard,
+`components/` chứa UI dùng chung, `features/` chứa màn hình theo nghiệp vụ,
+`admin/` chứa từng nhóm vận hành, còn `catalog.js` là nguồn dữ liệu catalog dùng
+chung. `App.jsx` chỉ điều phối route và các trang mua bán xe cốt lõi.
+
 Backend dùng Java 21, Spring Boot 3.5, Spring Security, JWT, JPA/Hibernate, Flyway và MySQL. Ảnh được lưu qua MinIO-compatible object storage.
 
 ## Chạy local bằng Docker
