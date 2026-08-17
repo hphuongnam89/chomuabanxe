@@ -1,0 +1,1 @@
+package com.cho2hand.marketplace.service.notification; import com.cho2hand.marketplace.dto.notification.NotificationResponse; import java.util.*; public interface NotificationService{void create(Long recipient,String type,String body,String path);List<NotificationResponse> list(Long recipient);void read(Long recipient,Long id);}

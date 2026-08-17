@@ -1,0 +1,54 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 15MB
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:carx-google-not-configured}
+            client-secret: ${GOOGLE_CLIENT_SECRET:carx-google-not-configured}
+            scope: openid,profile,email
+            redirect-uri: ${GOOGLE_REDIRECT_URI:{baseUrl}/api/v1/auth/login/oauth2/code/{registrationId}}
+
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
+
+app:
+  frontend-url: ${APP_FRONTEND_URL:http://localhost:8088}
+  auth-cookie-secure: ${APP_AUTH_COOKIE_SECURE:false}
+  cors:
+    allowed-origins: ${APP_ALLOWED_ORIGINS:http://localhost:8088}
+  captcha:
+    turnstile-secret-key: ${TURNSTILE_SECRET_KEY:}
+
+storage:
+  minio:
+    endpoint: ${MINIO_ENDPOINT}
+    access-key: ${MINIO_ACCESS_KEY}
+    secret-key: ${MINIO_SECRET_KEY}
+    bucket: ${MINIO_BUCKET:carx}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true

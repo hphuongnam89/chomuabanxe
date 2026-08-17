@@ -1,0 +1,3 @@
+package com.cho2hand.marketplace.entity.media;
+import jakarta.persistence.*; import java.io.Serializable; import java.util.Objects;
+@Embeddable public class ListingImageId implements Serializable { @Column(name="listing_id") private Long listingId; @Column(name="media_id") private Long mediaId; protected ListingImageId(){} public ListingImageId(Long l,Long m){listingId=l;mediaId=m;} public Long getListingId(){return listingId;} public Long getMediaId(){return mediaId;} public boolean equals(Object o){return o instanceof ListingImageId v&&Objects.equals(listingId,v.listingId)&&Objects.equals(mediaId,v.mediaId);} public int hashCode(){return Objects.hash(listingId,mediaId);} }

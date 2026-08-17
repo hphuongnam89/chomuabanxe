@@ -1,0 +1,2 @@
+package com.cho2hand.marketplace.repository.chat; import com.cho2hand.marketplace.entity.chat.Conversation; import java.util.*; import org.springframework.data.jpa.repository.JpaRepository;
+public interface ConversationRepository extends JpaRepository<Conversation,Long>{Optional<Conversation> findByListingIdAndBuyerUserIdAndSellerUserId(Long l,Long b,Long s); List<Conversation> findByBuyerUserIdOrSellerUserIdOrderByLastMessageAtDesc(Long b,Long s);}

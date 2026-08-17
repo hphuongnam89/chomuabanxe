@@ -1,0 +1,1 @@
+package com.cho2hand.marketplace.entity.report;import jakarta.persistence.*;@Entity@Table(name="report_reasons")public class ReportReason{@Id@Column(name="report_reason_id")private Long id;@Column(name="is_active")private boolean active;public Long getId(){return id;}}

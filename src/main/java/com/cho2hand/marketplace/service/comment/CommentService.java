@@ -1,0 +1,1 @@
+package com.cho2hand.marketplace.service.comment;import com.cho2hand.marketplace.dto.comment.*;import java.util.*;public interface CommentService{CommentResponse create(Long user,Long listing,CreateCommentRequest request);List<CommentResponse> list(Long listing);}

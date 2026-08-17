@@ -1,0 +1,1 @@
+package com.cho2hand.marketplace.service.trust; import com.cho2hand.marketplace.dto.trust.TrustScoreResponse; public interface FollowService {void follow(Long follower,Long seller);void unfollow(Long follower,Long seller);TrustScoreResponse trustScore(Long seller);}

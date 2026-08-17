@@ -1,0 +1,1 @@
+package com.cho2hand.marketplace.service.report;import com.cho2hand.marketplace.dto.report.CreateListingReportRequest;public interface ReportService{void reportListing(Long user,Long listing,CreateListingReportRequest request);}

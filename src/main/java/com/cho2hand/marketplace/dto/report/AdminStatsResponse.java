@@ -1,0 +1,1 @@
+package com.cho2hand.marketplace.dto.report; public record AdminStatsResponse(long totalUsers,long totalListings,long activeListings,long archivedListings,long publishedToday,long totalReports,long openReports){}

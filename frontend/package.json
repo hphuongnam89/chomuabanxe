@@ -1,0 +1,1 @@
+{"name":"carx-web","private":true,"type":"module","scripts":{"dev":"vite","build":"vite build","test":"node --test"},"dependencies":{"react":"19.2.7","react-dom":"19.2.7","react-router-dom":"7.18.2"},"devDependencies":{"@tailwindcss/vite":"4.3.2","@vitejs/plugin-react":"6.0.3","tailwindcss":"4.3.2","vite":"8.1.4"},"overrides":{"nanoid":"3.3.18","postcss":"8.5.26"}}

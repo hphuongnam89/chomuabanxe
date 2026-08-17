@@ -1,0 +1,1 @@
+package com.cho2hand.marketplace.repository.report;import com.cho2hand.marketplace.entity.report.ReportReason;import java.util.*;import org.springframework.data.jpa.repository.JpaRepository;public interface ReportReasonRepository extends JpaRepository<ReportReason,Long>{Optional<ReportReason> findByIdAndActiveTrue(Long id);}

@@ -1,0 +1,1 @@
+package com.cho2hand.marketplace.dto.report; import java.time.Instant; public record AdminReportResponse(Long id,Long listingId,Long reporterUserId,Long reasonId,String details,String status,String resolutionNote,Instant resolvedAt,Instant createdAt){}

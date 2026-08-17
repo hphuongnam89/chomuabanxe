@@ -1,0 +1,1 @@
+package com.cho2hand.marketplace.dto.trust; import java.time.Instant; public record TransactionResponse(Long id,Long listingId,String status,Instant sellerConfirmedAt,Instant buyerConfirmedAt,Instant confirmedAt,boolean reviewed){}

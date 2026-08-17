@@ -1,0 +1,1 @@
+package com.cho2hand.marketplace.dto.notification; import java.time.Instant; public record NotificationResponse(Long id,String type,String body,String referencePath,Instant readAt,Instant createdAt){}

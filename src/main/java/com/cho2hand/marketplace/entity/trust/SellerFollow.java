@@ -1,0 +1,2 @@
+package com.cho2hand.marketplace.entity.trust; import jakarta.persistence.*; import java.time.Instant;
+@Entity @Table(name="seller_follows") public class SellerFollow {@EmbeddedId private SellerFollowId id;@Column(name="created_at") private Instant createdAt;protected SellerFollow(){}public SellerFollow(Long f,Long s){id=new SellerFollowId(f,s);}@PrePersist void created(){createdAt=Instant.now();}}

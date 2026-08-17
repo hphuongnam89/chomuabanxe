@@ -1,0 +1,1 @@
+package com.cho2hand.marketplace.repository.comment;import com.cho2hand.marketplace.entity.comment.Comment;import java.util.*;import org.springframework.data.jpa.repository.JpaRepository;public interface CommentRepository extends JpaRepository<Comment,Long>{List<Comment> findByListingIdAndStatusOrderByCreatedAtAsc(Long id,String status);}

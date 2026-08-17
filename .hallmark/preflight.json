@@ -1,0 +1,8 @@
+{
+  "scannedAt": "2026-07-18",
+  "framework": "React + Vite",
+  "css": "Tailwind import plus custom CSS tokens",
+  "palette": ["--orange", "--orange-dark", "--orange-soft", "--ink", "--muted", "--line", "--surface", "--canvas"],
+  "motion": "motion-cut",
+  "preserve": ["existing routes", "OldMarket orange brand", "minimal marketplace information architecture"]
+}
