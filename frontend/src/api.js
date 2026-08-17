@@ -1,5 +1,6 @@
 const SESSION_KEY = "carx-session";
 const LEGACY_SESSION_KEY = "oldmarket-session";
+let csrf;
 export const markSession = () => {
   sessionStorage.setItem(SESSION_KEY, "1");
   sessionStorage.removeItem(LEGACY_SESSION_KEY);
@@ -9,7 +10,7 @@ export const hasSession = () =>
 export const logout = () => {
   sessionStorage.removeItem(SESSION_KEY);
   sessionStorage.removeItem(LEGACY_SESSION_KEY);
-  fetch("/api/v1/auth/logout", { method: "POST", credentials: "same-origin" }).catch(() => {});
+  request("/api/v1/auth/logout", { method: "POST" }).catch(() => {});
   window.dispatchEvent(new Event("auth-changed"));
 };
 export class ApiError extends Error {
@@ -17,6 +18,17 @@ export class ApiError extends Error {
     super(message);
     this.status = status;
   }
+}
+async function csrfHeaders() {
+  if (!csrf) {
+    const response = await fetch("/api/v1/auth/csrf", {
+      credentials: "same-origin",
+    });
+    if (!response.ok)
+      throw new ApiError("Không thể thiết lập phiên bảo mật. Vui lòng tải lại trang.", response.status);
+    csrf = await response.json();
+  }
+  return { [csrf.headerName]: csrf.token };
 }
 async function request(path, options = {}) {
   const { timeout = 15000, ...fetchOptions } = options,
@@ -26,11 +38,16 @@ async function request(path, options = {}) {
     isAuthProbe =
       path === "/api/v1/users/me" || path === "/api/v1/notifications";
   try {
+    const method = String(fetchOptions.method || "GET").toUpperCase();
+    const protection = ["GET", "HEAD", "OPTIONS", "TRACE"].includes(method)
+      ? {}
+      : await csrfHeaders();
     const response = await fetch(path, {
       ...fetchOptions,
       credentials: "same-origin",
       signal: controller.signal,
       headers: {
+        ...protection,
         ...fetchOptions.headers,
       },
     });
@@ -163,7 +180,8 @@ export const createReview = (id, rating, body) =>
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ rating: Number(rating), body }),
   });
-export const adminReports = () => request("/api/v1/admin/reports");
+export const adminReports = (params = {}) =>
+  request(`/api/v1/admin/reports?${adminParams(params)}`);
 export const adminStats = () => request("/api/v1/admin/stats");
 const adminParams = (params) =>
   new URLSearchParams(
@@ -177,6 +195,12 @@ export const adminActivateUser = (id) =>
   request(`/api/v1/admin/users/${id}/activate`, { method: "PATCH" });
 export const adminListings = (params = {}) =>
   request(`/api/v1/admin/listings?${adminParams(params)}`);
+export const adminUpdateListing = (id, data) =>
+  request(`/api/v1/admin/listings/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 export const adminRestoreListing = (id) =>
   request(`/api/v1/admin/listings/${id}/restore`, { method: "PATCH" });
 export const adminArchive = (id) =>

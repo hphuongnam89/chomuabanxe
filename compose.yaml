@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql:8.4
+    image: mysql:8.4@sha256:c831a0f11348d402b43d77453e17d770be2eef356615a2823fe0f5a0d6c8b9af
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-carx}
       MYSQL_USER: ${MYSQL_USER:-carx}
@@ -13,7 +13,7 @@ services:
       timeout: 3s
       retries: 20
   minio:
-    image: minio/minio:latest
+    image: minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
     command: server /data --console-address :9001
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-carx}
@@ -21,7 +21,7 @@ services:
       MINIO_BUCKET: ${MINIO_BUCKET:-carx}
     volumes: [minio-data:/data]
   minio-init:
-    image: minio/mc:latest
+    image: minio/mc:latest@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727
     depends_on: [minio]
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-carx}

@@ -3,6 +3,8 @@ package com.cho2hand.marketplace.service.impl.admin;
 import com.cho2hand.marketplace.dto.admin.*;
 import com.cho2hand.marketplace.dto.report.AdminReportResponse;
 import com.cho2hand.marketplace.dto.report.AdminStatsResponse;
+import com.cho2hand.marketplace.dto.listing.ListingResponse;
+import com.cho2hand.marketplace.dto.listing.UpdateListingRequest;
 import com.cho2hand.marketplace.entity.listing.Listing;
 import com.cho2hand.marketplace.entity.category.Category;
 import com.cho2hand.marketplace.entity.admin.AdminAuditLog;
@@ -29,6 +31,7 @@ import com.cho2hand.marketplace.request.admin.AdminNotificationRequest;
 import com.cho2hand.marketplace.request.admin.AdminUserRolesRequest;
 import com.cho2hand.marketplace.service.admin.AdminService;
 import com.cho2hand.marketplace.service.notification.NotificationService;
+import com.cho2hand.marketplace.service.listing.ListingService;
 import com.cho2hand.marketplace.service.storage.StorageHealthService;
 import com.cho2hand.marketplace.security.RateLimitFilter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -67,6 +70,7 @@ public class AdminServiceImpl implements AdminService {
     private final RateLimitFilter rateLimitFilter;
     private final StorageHealthService storageHealthService;
     private final JdbcTemplate jdbc;
+    private final ListingService listingService;
 
     public AdminServiceImpl(ListingReportRepository reports, ListingRepository listings,
             UserRepository users, UserRoleRepository userRoles, CategoryRepository categories,
@@ -74,7 +78,7 @@ public class AdminServiceImpl implements AdminService {
             SellerReviewRepository reviews, NotificationRepository notifications,
             NotificationService notificationService, AdminAuditLogRepository auditLogs, RoleRepository roles,
             UserAuthIdentityRepository identities, RateLimitFilter rateLimitFilter,
-            StorageHealthService storageHealthService, JdbcTemplate jdbc) {
+            StorageHealthService storageHealthService, JdbcTemplate jdbc, ListingService listingService) {
         this.reports = reports;
         this.listings = listings;
         this.users = users;
@@ -91,6 +95,7 @@ public class AdminServiceImpl implements AdminService {
         this.rateLimitFilter = rateLimitFilter;
         this.storageHealthService = storageHealthService;
         this.jdbc = jdbc;
+        this.listingService = listingService;
     }
 
     @Override @Transactional(readOnly = true)
@@ -105,12 +110,18 @@ public class AdminServiceImpl implements AdminService {
 
     @Override @Transactional(readOnly = true)
     public Page<AdminUserResponse> users(String query, Long statusId, Pageable pageable) {
-        return users.searchForAdmin(normalize(query), statusId, pageable).map(user -> {
-            var roles = userRoles.findRoleCodesByUserId(user.getId());
-            return new AdminUserResponse(user.getId(), user.getDisplayName(), user.getUserStatusId(),
+        var page = users.searchForAdmin(normalize(query), statusId, pageable);
+        var ids = page.getContent().stream().map(user -> user.getId()).toList();
+        if (ids.isEmpty()) return new PageImpl<>(List.of(), pageable, page.getTotalElements());
+        Map<Long, List<String>> rolesByUser = new HashMap<>();
+        userRoles.findRoleCodesByUserIds(ids).forEach(row ->
+                rolesByUser.computeIfAbsent(row.getUserId(), ignored -> new ArrayList<>()).add(row.getRoleCode()));
+        var listingCounts = listings.countBySellerUserIds(ids).stream().collect(Collectors.toMap(
+                ListingRepository.SellerListingCount::getSellerUserId,
+                ListingRepository.SellerListingCount::getListingCount));
+        return page.map(user -> new AdminUserResponse(user.getId(), user.getDisplayName(), user.getUserStatusId(),
                     userStatus(user.getUserStatusId()), user.getJoinedAt(), user.getLastActiveAt(),
-                    listings.countBySellerUserId(user.getId()), roles);
-        });
+                    listingCounts.getOrDefault(user.getId(), 0L), rolesByUser.getOrDefault(user.getId(), List.of())));
     }
 
     @Override
@@ -136,12 +147,19 @@ public class AdminServiceImpl implements AdminService {
         return new PageImpl<>(content, pageable, page.getTotalElements());
     }
 
+    @Override
+    public ListingResponse updateListing(Long adminUserId, Long id, UpdateListingRequest request) {
+        var updated = listingService.updateAsAdmin(id, request);
+        audit(adminUserId, "UPDATE_LISTING", "LISTING", id, updated.title());
+        return updated;
+    }
+
     @Override @Transactional(readOnly = true)
-    public List<AdminReportResponse> reports() {
-        return reports.findAllByOrderByCreatedAtDesc().stream().map(report -> new AdminReportResponse(
+    public Page<AdminReportResponse> reports(Pageable pageable) {
+        return reports.findAllByOrderByCreatedAtDesc(pageable).map(report -> new AdminReportResponse(
                 report.getId(), report.getListingId(), report.getReporterUserId(), report.getReasonId(),
                 report.getDetails(), report.getStatus(), report.getResolutionNote(), report.getResolvedAt(),
-                report.getCreatedAt())).toList();
+                report.getCreatedAt()));
     }
 
     @Override public void archive(Long adminUserId, Long id) {

@@ -1,0 +1,35 @@
+export default [
+  {
+    files: ["src/**/*.{js,jsx}", "test/**/*.js", "eslint.config.js"],
+    ignores: ["dist/**"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      parserOptions: { ecmaFeatures: { jsx: true } },
+      globals: {
+        AbortController: "readonly",
+        Blob: "readonly",
+        clearInterval: "readonly",
+        clearTimeout: "readonly",
+        confirm: "readonly",
+        document: "readonly",
+        Event: "readonly",
+        fetch: "readonly",
+        FileReader: "readonly",
+        FormData: "readonly",
+        localStorage: "readonly",
+        sessionStorage: "readonly",
+        setInterval: "readonly",
+        setTimeout: "readonly",
+        URL: "readonly",
+        URLSearchParams: "readonly",
+        window: "readonly",
+      },
+    },
+    rules: {
+      "no-dupe-keys": "error",
+      "no-undef": "error",
+      "no-unreachable": "error",
+    },
+  },
+];

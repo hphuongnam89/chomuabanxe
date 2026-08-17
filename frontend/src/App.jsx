@@ -16,6 +16,7 @@ import {
   adminDismissReport,
   adminReports,
   adminStats,
+  adminUpdateListing,
   archiveListing,
   categories,
   changePassword,
@@ -59,6 +60,7 @@ import {
   vehicleModels,
 } from "./api.js";
 import AdminConsole from "./AdminConsole.jsx";
+import { safeReturnTo } from "./authNavigation.js";
 import { viewedPreferences } from "./recommendationPreferences.js";
 const nav = [
   ["/", "Trang chủ"],
@@ -611,7 +613,15 @@ function VehicleFields({ catalog, item, search = false, values = {}, onChange })
   return search ? fields : <section className="details-fields vehicle-fields"><h2>Thông tin xe</h2>{fields}</section>;
 }
 function Protected({ children }) {
-  return hasSession() ? children : <Navigate to="/dang-nhap" replace />;
+  const location = useLocation();
+  if (hasSession()) return children;
+  const returnTo = `${location.pathname}${location.search}`;
+  return (
+    <Navigate
+      to={`/dang-nhap?returnTo=${encodeURIComponent(returnTo)}&message=${encodeURIComponent("Vui lòng đăng nhập để tiếp tục.")}`}
+      replace
+    />
+  );
 }
 function AdminOnly({ children }) {
   const [current, setCurrent] = useState(),
@@ -1290,7 +1300,7 @@ function Login() {
     try {
       const session = await login(f.get("email"), f.get("password"));
       navigate(
-        query.get("returnTo") ||
+        safeReturnTo(query.get("returnTo")) ||
           (session.roles?.some((role) => ["ADMIN", "STAFF_CUSTOMER", "STAFF_CONTENT"].includes(role))
             ? "/admin"
             : "/"),
@@ -1539,7 +1549,7 @@ function Post() {
     </Page>
   );
 }
-function EditPost() {
+function EditPost({ adminMode = false }) {
   const { id } = useParams(),
     navigate = useNavigate(),
     [item, setItem] = useState(),
@@ -1550,13 +1560,13 @@ function EditPost() {
     [submitting, setSubmitting] = useState(false),
     catalog = useCatalog();
   useEffect(() => {
-    Promise.all([listing(id), images(id)])
+    Promise.all([listing(id), adminMode ? Promise.resolve([]) : images(id)])
       .then(([listingItem, listingPhotos]) => {
         setItem(listingItem);
         setPhotos(listingPhotos);
       })
       .catch((error) => setError(error.message));
-  }, [id]);
+  }, [adminMode, id]);
   function removePhoto(photo) {
     setPhotos(photos.filter((value) => value.id !== photo.id));
     setRemoved([...removed, photo.id]);
@@ -1594,7 +1604,7 @@ function EditPost() {
     setError("");
     const f = new FormData(e.currentTarget);
     try {
-      await updateListing(id, {
+      const payload = {
         title: f.get("title"),
         description: withDetails(f.get("deviceType"), f.get("description")),
         priceAmount: Number(f.get("price")),
@@ -1615,10 +1625,13 @@ function EditPost() {
           drivelineId: Number(f.get("vehicleDrivelineId")),
           mileageKm: f.get("mileageKm") ? Number(f.get("mileageKm")) : null,
         },
-      });
-      await Promise.all(removed.map((mediaId) => deleteImage(id, mediaId)));
-      await Promise.all(newFiles.map((item) => uploadImage(id, item.file)));
-      navigate(`/tin/${id}`);
+      };
+      await (adminMode ? adminUpdateListing(id, payload) : updateListing(id, payload));
+      if (!adminMode) {
+        await Promise.all(removed.map((mediaId) => deleteImage(id, mediaId)));
+        await Promise.all(newFiles.map((item) => uploadImage(id, item.file)));
+      }
+      navigate(adminMode ? "/admin" : `/tin/${id}`);
     } catch (error) {
       setError(error.message);
       setSubmitting(false);
@@ -1626,12 +1639,12 @@ function EditPost() {
   }
   if (!item)
     return (
-      <Page title="Chỉnh sửa tin">
+      <Page title={adminMode ? "Quản trị chỉnh sửa tin" : "Chỉnh sửa tin"}>
         {error ? <p className="error">{error}</p> : "Đang tải..."}
       </Page>
     );
   return (
-    <Page title="Chỉnh sửa tin">
+    <Page title={adminMode ? "Quản trị chỉnh sửa tin" : "Chỉnh sửa tin"}>
       <form className="panel form" onSubmit={submit}>
         <input
           name="title"
@@ -1641,7 +1654,7 @@ function EditPost() {
         />
         <textarea
           name="description"
-          defaultValue={stripDetails(item.description)}
+          defaultValue={item.description}
           required
         />
         <input
@@ -1653,7 +1666,7 @@ function EditPost() {
         />
         <CatalogFields catalog={catalog} item={item} />
         <VehicleFields catalog={catalog} item={item} />
-        <section className="image-manager">
+        {!adminMode && <section className="image-manager">
           <div>
             <b>Ảnh xe</b>
             <small>{photos.length + newFiles.length}/3 ảnh</small>
@@ -1696,7 +1709,7 @@ function EditPost() {
             />
           </label>
           <small>JPEG, PNG hoặc WEBP, dưới 5 MB mỗi ảnh.</small>
-        </section>
+        </section>}
         <button
           className="primary"
           disabled={
@@ -3032,6 +3045,7 @@ export default function App() {
           <Route path="/danh-gia" element={guarded(<Reviews />)} />
           <Route path="/bao-cao" element={guarded(<Report />)} />
           <Route path="/admin" element={admin(<AdminConsole />)} />
+          <Route path="/admin/tin/:id/sua" element={admin(<EditPost adminMode />)} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Shell>

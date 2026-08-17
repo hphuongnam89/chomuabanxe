@@ -48,7 +48,7 @@ export default function AdminConsole({ roles = [] }) {
     [stats, setStats] = useState(),
     [users, setUsers] = useState(),
     [listings, setListings] = useState(),
-    [reports, setReports] = useState([]),
+    [reports, setReports] = useState(),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(""),
     [userQuery, setUserQuery] = useState(""),
@@ -76,7 +76,7 @@ export default function AdminConsole({ roles = [] }) {
     try {
       const [summary, items] = await Promise.all([
         adminStats(),
-        adminReports(),
+        adminReports({ size: 20 }),
       ]);
       setStats(summary);
       setReports(items);
@@ -84,10 +84,10 @@ export default function AdminConsole({ roles = [] }) {
       setError(e.message);
     }
   }
-  async function loadReports() {
+  async function loadReports(page = 0) {
     try {
       setError("");
-      setReports(await adminReports());
+      setReports(await adminReports({ page, size: 20 }));
     } catch (e) {
       setError(e.message);
     }
@@ -179,7 +179,7 @@ export default function AdminConsole({ roles = [] }) {
     setTab(next);
     if (next === "users" && !users) loadUsers();
     if (next === "listings" && !listings) loadListings();
-    if (next === "reports" && !reports.length) loadReports();
+    if (next === "reports" && !reports?.content?.length) loadReports();
     if (next === "categories" && !categoryItems) loadCategories();
     if (next === "vehicle-catalog" && !vehicleCatalogItems) loadVehicleCatalog();
     if (next === "locations" && !locationItems) loadLocations();
@@ -253,14 +253,14 @@ export default function AdminConsole({ roles = [] }) {
         ? adminArchiveReport(report.id)
         : adminDismissReport(report.id));
       if (isAdmin) await loadOverview();
-      else await loadReports();
+      else await loadReports(reports?.number || 0);
     } catch (e) {
       setError(e.message);
     } finally {
       setBusy("");
     }
   }
-  const openReports = reports.filter((item) => item.status === "OPEN");
+  const openReports = (reports?.content || []).filter((item) => item.status === "OPEN");
   const canSee = (next) =>
     (next === "overview" && isAdmin) ||
     (next === "users" && canCustomer) ||
@@ -387,7 +387,7 @@ export default function AdminConsole({ roles = [] }) {
             />
           )}
           {tab === "reports" && (
-            <Reports items={reports} resolve={resolveReport} busy={busy} />
+            <Reports data={reports} resolve={resolveReport} busy={busy} page={loadReports} />
           )}
           {tab === "categories" && (
             <Categories
@@ -713,6 +713,9 @@ function Listings({
                   </td>
                   <td>{date(item.publishedAt)}</td>
                   <td>
+                    <Link className="secondary" to={`/admin/tin/${item.id}/sua`}>
+                      Sửa
+                    </Link>
                     <button
                       className={item.archivedAt ? "secondary" : "danger"}
                       disabled={busy === `listing-${item.id}`}
@@ -736,7 +739,8 @@ function Listings({
     </>
   );
 }
-function Reports({ items, resolve, busy }) {
+function Reports({ data, resolve, busy, page }) {
+  const items = data?.content || [];
   const open = items.filter((item) => item.status === "OPEN"),
     history = items.filter((item) => item.status !== "OPEN");
   return (
@@ -805,6 +809,7 @@ function Reports({ items, resolve, busy }) {
           </div>
         </section>
       )}
+      <Pager data={data} onPage={page} />
     </>
   );
 }

@@ -13,6 +13,8 @@ import com.cho2hand.marketplace.dto.admin.AdminAuditResponse;
 import com.cho2hand.marketplace.dto.admin.AdminHealthResponse;
 import com.cho2hand.marketplace.dto.report.AdminReportResponse;
 import com.cho2hand.marketplace.dto.report.AdminStatsResponse;
+import com.cho2hand.marketplace.dto.listing.ListingResponse;
+import com.cho2hand.marketplace.dto.listing.UpdateListingRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
@@ -25,7 +27,8 @@ public interface AdminService {
     Page<AdminUserResponse> users(String query, Long statusId, Pageable pageable);
     void setUserSuspended(Long adminUserId, Long userId, boolean suspended);
     Page<AdminListingResponse> listings(String query, Boolean archived, Pageable pageable);
-    List<AdminReportResponse> reports();
+    ListingResponse updateListing(Long adminUserId, Long id, UpdateListingRequest request);
+    Page<AdminReportResponse> reports(Pageable pageable);
     void archive(Long adminUserId, Long listingId);
     void restore(Long adminUserId, Long listingId);
     void resolve(Long adminUserId, Long reportId, boolean archive);

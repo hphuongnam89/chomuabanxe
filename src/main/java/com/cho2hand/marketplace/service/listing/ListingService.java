@@ -6,6 +6,7 @@ public interface ListingService {
     ListingResponse create(Long sellerId, CreateListingRequest request);
     ListingResponse get(Long id);
     ListingResponse update(Long sellerId, Long id, UpdateListingRequest request);
+    ListingResponse updateAsAdmin(Long id, UpdateListingRequest request);
     void archive(Long sellerId, Long id);
     Page<ListingResponse> mine(Long sellerId, int page, int size);
     Page<ListingResponse> search(ListingSearchRequest request);

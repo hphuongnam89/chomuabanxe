@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -32,7 +34,11 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter, RateLimitFilter rateLimitFilter, OAuth2LoginSuccessHandler oauthSuccess) throws Exception {
-        return http.csrf(csrf -> csrf.disable())
+        var csrfHandler = new CsrfTokenRequestAttributeHandler();
+        csrfHandler.setCsrfRequestAttributeName(null);
+        return http.csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(csrfHandler))
                 .cors(Customizer.withDefaults())
                 .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
@@ -50,7 +56,8 @@ public class SecurityConfig {
                         .referrerPolicy(referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login",
-                                "/api/v1/auth/password-reset-requests", "/api/v1/auth/password-resets").permitAll()
+                                "/api/v1/auth/logout", "/api/v1/auth/password-reset-requests", "/api/v1/auth/password-resets").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/auth/csrf").permitAll()
                         .requestMatchers("/oauth2/**", "/login/**", "/api/v1/auth/oauth2/**", "/api/v1/auth/login/oauth2/**").permitAll()
                         .requestMatchers("/api/v1/categories/**", "/api/v1/locations/**", "/api/v1/vehicle-catalog/**", "/api/v1/storage/health", "/actuator/health", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/listings/mine").authenticated()
@@ -59,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/admin/users").hasAuthority("PERM_customer.read")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/admin/users/*/suspend", "/api/v1/admin/users/*/activate").hasAuthority("PERM_customer.update_status")
                         .requestMatchers(HttpMethod.GET, "/api/v1/admin/listings", "/api/v1/admin/reports").hasAuthority("PERM_listing.read_admin")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/admin/listings/*").hasAuthority("PERM_listing.moderate")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/admin/listings/*/archive", "/api/v1/admin/listings/*/restore", "/api/v1/admin/reports/*/dismiss", "/api/v1/admin/reports/*/archive").hasAuthority("PERM_listing.moderate")
                         .requestMatchers(HttpMethod.GET, "/api/v1/admin/vehicle-catalog", "/api/v1/admin/vehicle-catalog/**").hasAuthority("PERM_vehicle_catalog.read")
                         .requestMatchers(HttpMethod.POST, "/api/v1/admin/vehicle-catalog/**").hasAuthority("PERM_vehicle_catalog.write")
@@ -78,7 +86,8 @@ public class SecurityConfig {
         var config = new CorsConfiguration();
         config.setAllowedOrigins(Arrays.stream(origins.split(",")).map(String::trim).filter(value -> !value.isBlank()).toList());
         config.setAllowedMethods(java.util.List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(java.util.List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE));
+        config.setAllowedHeaders(java.util.List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE, "X-XSRF-TOKEN"));
+        config.setAllowCredentials(true);
         config.setMaxAge(3600L);
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", config);

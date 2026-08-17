@@ -78,7 +78,16 @@ public class ListingServiceImpl implements ListingService {
 
     @Override
     public ListingResponse update(Long seller, Long id, UpdateListingRequest request) {
-        var listing = owned(seller, id);
+        return update(owned(seller, id), id, request);
+    }
+
+    @Override
+    public ListingResponse updateAsAdmin(Long id, UpdateListingRequest request) {
+        var listing = listings.findById(id).orElseThrow(() -> new ListingNotFoundException(id));
+        return update(listing, id, request);
+    }
+
+    private ListingResponse update(Listing listing, Long id, UpdateListingRequest request) {
         if (request.categoryId() != null) { validateCategory(request.categoryId()); listing.setCategoryId(request.categoryId()); }
         if (request.conditionId() != null) { validateCondition(request.conditionId()); listing.setConditionId(request.conditionId()); }
         if (request.locationId() != null) { validateLocation(request.locationId()); listing.setLocationId(request.locationId()); }

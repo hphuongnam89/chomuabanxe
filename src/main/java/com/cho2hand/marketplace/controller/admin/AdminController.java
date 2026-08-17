@@ -16,6 +16,9 @@ import com.cho2hand.marketplace.dto.report.AdminReportResponse;
 import com.cho2hand.marketplace.dto.report.AdminStatsResponse;
 import com.cho2hand.marketplace.service.admin.AdminService;
 import com.cho2hand.marketplace.service.vehicle.AdminVehicleCatalogService;
+import com.cho2hand.marketplace.dto.listing.ListingResponse;
+import com.cho2hand.marketplace.dto.listing.UpdateListingRequest;
+import com.cho2hand.marketplace.dto.common.PageResponse;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -24,7 +27,6 @@ import com.cho2hand.marketplace.request.admin.AdminCategoryRequest;
 import com.cho2hand.marketplace.request.admin.AdminNotificationRequest;
 import com.cho2hand.marketplace.request.admin.AdminUserRolesRequest;
 import java.util.List;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -44,11 +46,11 @@ public class AdminController {
 
     @GetMapping("/stats") public AdminStatsResponse stats() { return service.stats(); }
     @GetMapping("/users")
-    public Page<AdminUserResponse> users(@RequestParam(required = false) String query,
+    public PageResponse<AdminUserResponse> users(@RequestParam(required = false) String query,
             @RequestParam(required = false) Long statusId,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "20") @Positive @Max(100) int size) {
-        return service.users(query, statusId, PageRequest.of(page, size));
+        return PageResponse.from(service.users(query, statusId, PageRequest.of(page, size)));
     }
     @PatchMapping("/users/{id}/suspend") @ResponseStatus(HttpStatus.NO_CONTENT)
     public void suspend(@AuthenticationPrincipal Long admin, @PathVariable @Positive Long id) {
@@ -59,13 +61,23 @@ public class AdminController {
         service.setUserSuspended(admin, id, false);
     }
     @GetMapping("/listings")
-    public Page<AdminListingResponse> listings(@RequestParam(required = false) String query,
+    public PageResponse<AdminListingResponse> listings(@RequestParam(required = false) String query,
             @RequestParam(required = false) Boolean archived,
             @RequestParam(defaultValue = "0") @PositiveOrZero int page,
             @RequestParam(defaultValue = "20") @Positive @Max(100) int size) {
-        return service.listings(query, archived, PageRequest.of(page, size));
+        return PageResponse.from(service.listings(query, archived, PageRequest.of(page, size)));
     }
-    @GetMapping("/reports") public List<AdminReportResponse> reports() { return service.reports(); }
+    @GetMapping("/reports")
+    public PageResponse<AdminReportResponse> reports(
+            @RequestParam(defaultValue = "0") @PositiveOrZero int page,
+            @RequestParam(defaultValue = "20") @Positive @Max(100) int size) {
+        return PageResponse.from(service.reports(PageRequest.of(page, size)));
+    }
+    @PatchMapping("/listings/{id}")
+    public ListingResponse updateListing(@AuthenticationPrincipal Long admin, @PathVariable @Positive Long id,
+            @Valid @RequestBody UpdateListingRequest request) {
+        return service.updateListing(admin, id, request);
+    }
     @PatchMapping("/listings/{id}/archive") @ResponseStatus(HttpStatus.NO_CONTENT)
     public void archive(@AuthenticationPrincipal Long admin, @PathVariable @Positive Long id) { service.archive(admin,id); }
     @PatchMapping("/listings/{id}/restore") @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -81,9 +93,9 @@ public class AdminController {
     @PutMapping("/categories/{id}")
     public AdminCategoryResponse updateCategory(@AuthenticationPrincipal Long admin,@PathVariable @Positive Long id,@Valid @RequestBody AdminCategoryRequest request){return service.updateCategory(admin,id,request);}
     @GetMapping("/locations")
-    public Page<AdminLocationResponse> locations(@RequestParam(required=false) String query,@RequestParam(required=false) Byte level,
+    public PageResponse<AdminLocationResponse> locations(@RequestParam(required=false) String query,@RequestParam(required=false) Byte level,
             @RequestParam(defaultValue="0") @PositiveOrZero int page,@RequestParam(defaultValue="20") @Positive @Max(100) int size){
-        return service.locations(query,level,PageRequest.of(page,size));
+        return PageResponse.from(service.locations(query,level,PageRequest.of(page,size)));
     }
     @PatchMapping("/locations/{id}/activate") @ResponseStatus(HttpStatus.NO_CONTENT)
     public void activateLocation(@AuthenticationPrincipal Long admin,@PathVariable @Positive Long id){service.setLocationActive(admin,id,true);}
@@ -91,14 +103,14 @@ public class AdminController {
     public void deactivateLocation(@AuthenticationPrincipal Long admin,@PathVariable @Positive Long id){service.setLocationActive(admin,id,false);}
     @GetMapping("/operations/stats") public AdminOperationsStatsResponse operationsStats(){return service.operationsStats();}
     @GetMapping("/transactions")
-    public Page<AdminTransactionResponse> transactions(@RequestParam(required=false) String status,
+    public PageResponse<AdminTransactionResponse> transactions(@RequestParam(required=false) String status,
             @RequestParam(defaultValue="0") @PositiveOrZero int page,@RequestParam(defaultValue="20") @Positive @Max(100) int size){
-        return service.transactions(status,PageRequest.of(page,size));
+        return PageResponse.from(service.transactions(status,PageRequest.of(page,size)));
     }
     @GetMapping("/reviews")
-    public Page<AdminReviewResponse> reviews(@RequestParam(required=false) String status,
+    public PageResponse<AdminReviewResponse> reviews(@RequestParam(required=false) String status,
             @RequestParam(defaultValue="0") @PositiveOrZero int page,@RequestParam(defaultValue="20") @Positive @Max(100) int size){
-        return service.reviews(status,PageRequest.of(page,size));
+        return PageResponse.from(service.reviews(status,PageRequest.of(page,size)));
     }
     @PatchMapping("/reviews/{id}/hide") @ResponseStatus(HttpStatus.NO_CONTENT)
     public void hideReview(@AuthenticationPrincipal Long admin,@PathVariable @Positive Long id){service.setReviewVisible(admin,id,false);}
@@ -107,9 +119,9 @@ public class AdminController {
     @PostMapping("/notifications") @ResponseStatus(HttpStatus.NO_CONTENT)
     public void sendNotification(@AuthenticationPrincipal Long admin,@Valid @RequestBody AdminNotificationRequest request){service.sendNotification(admin,request);}
     @GetMapping("/audit-logs")
-    public Page<com.cho2hand.marketplace.dto.admin.AdminAuditResponse> auditLogs(
+    public PageResponse<com.cho2hand.marketplace.dto.admin.AdminAuditResponse> auditLogs(
             @RequestParam(defaultValue="0") @PositiveOrZero int page,@RequestParam(defaultValue="30") @Positive @Max(100) int size){
-        return service.auditLogs(PageRequest.of(page,size));
+        return PageResponse.from(service.auditLogs(PageRequest.of(page,size)));
     }
     @GetMapping("/health") public com.cho2hand.marketplace.dto.admin.AdminHealthResponse health(){return service.health();}
     @GetMapping("/vehicle-catalog")

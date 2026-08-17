@@ -1,6 +1,8 @@
 package com.cho2hand.marketplace.repository.listing;
 import com.cho2hand.marketplace.entity.listing.Listing;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,11 +10,18 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 public interface ListingRepository extends JpaRepository<Listing, Long>, JpaSpecificationExecutor<Listing> {
+    interface SellerListingCount {
+        Long getSellerUserId();
+        long getListingCount();
+    }
+
     long countByArchivedAtIsNull();
     long countByArchivedAtIsNotNull();
     long countByListingStatusIdAndArchivedAtIsNull(Long listingStatusId);
     long countByPublishedAtGreaterThanEqualAndArchivedAtIsNull(Instant publishedAt);
     long countBySellerUserId(Long sellerUserId);
+    @Query("select l.sellerUserId as sellerUserId, count(l) as listingCount from Listing l where l.sellerUserId in :sellerIds group by l.sellerUserId")
+    List<SellerListingCount> countBySellerUserIds(@Param("sellerIds") Collection<Long> sellerIds);
     @Query("""
             select l from Listing l
             where (:query is null or lower(l.title) like lower(concat('%', :query, '%')) or str(l.id) = :query)
