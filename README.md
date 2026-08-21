@@ -47,6 +47,8 @@ docker compose up --build
 ```text
 Frontend: http://localhost:8088
 API:      http://localhost:8088/api/v1
+Swagger:  http://localhost:8088/swagger-ui.html
+OpenAPI:  http://localhost:8088/v3/api-docs
 Health:   http://localhost:8088/actuator/health
 MinIO:    http://localhost:9001
 ```

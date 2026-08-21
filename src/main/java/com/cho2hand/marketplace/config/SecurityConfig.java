@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/login",
                                 "/api/v1/auth/logout", "/api/v1/auth/password-reset-requests", "/api/v1/auth/password-resets").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/auth/csrf").permitAll()
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/oauth2/**", "/login/**", "/api/v1/auth/oauth2/**", "/api/v1/auth/login/oauth2/**").permitAll()
                         .requestMatchers("/api/v1/categories/**", "/api/v1/locations/**", "/api/v1/vehicle-catalog/**", "/api/v1/storage/health", "/actuator/health", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/listings/mine").authenticated()
