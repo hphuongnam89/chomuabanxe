@@ -32,18 +32,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         var header = request.getHeader("Authorization");
         var token = header != null && header.startsWith("Bearer ") ? header.substring(7) : null;
         if (token == null && request.getCookies() != null) {
+            String legacyToken = null;
             for (var cookie : request.getCookies()) {
-                if ("CARX_TOKEN".equals(cookie.getName()) || "OLDMARKET_TOKEN".equals(cookie.getName())) {
+                if ("CARX_TOKEN".equals(cookie.getName())) {
                     token = cookie.getValue();
                     break;
                 }
+                if ("OLDMARKET_TOKEN".equals(cookie.getName())) legacyToken = cookie.getValue();
             }
+            if (token == null) token = legacyToken;
         }
-        if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (token != null) {
             try {
                 Claims claims = tokenProvider.parse(token);
                 var userId = Long.valueOf(claims.getSubject());
                 if (users.findById(userId).filter(user -> user.getUserStatusId() == 1L).isEmpty()) {
+                    SecurityContextHolder.clearContext();
                     chain.doFilter(request, response);
                     return;
                 }
@@ -54,7 +58,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(
                         new UsernamePasswordAuthenticationToken(userId, null,
                                 java.util.stream.Stream.concat(roles.stream(), permissions.stream()).toList()));
-            } catch (RuntimeException ignored) { }
+            } catch (RuntimeException ignored) {
+                SecurityContextHolder.clearContext();
+            }
         }
         chain.doFilter(request, response);
     }

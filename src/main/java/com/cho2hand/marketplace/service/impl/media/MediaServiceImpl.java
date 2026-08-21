@@ -86,7 +86,7 @@ public class MediaServiceImpl implements MediaService {
             asset.setByteSize(webp.length);
             if (!storedInR2) asset.setStorageData(webp);
             asset = media.save(asset);
-            var order = (short) images.countByIdListingId(listing);
+            var order = (short) images.nextSortOrder(listing);
             images.save(new ListingImage(listing, asset.getId(), order));
             return response(listing, asset, order);
         } catch (Exception exception) {
@@ -141,7 +141,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     private void owned(Long user, Long id) {
-        var listing = listings.findById(id).orElseThrow(() -> new ListingNotFoundException(id));
+        var listing = listings.findByIdForUpdate(id).orElseThrow(() -> new ListingNotFoundException(id));
         if (!user.equals(listing.getSellerUserId())) throw new ListingAccessDeniedException();
     }
 

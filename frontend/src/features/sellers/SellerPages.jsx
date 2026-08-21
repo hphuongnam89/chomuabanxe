@@ -8,6 +8,7 @@ import {
 } from "../../api.js";
 import { useCatalog } from "../../catalog.js";
 import { ListingCard, Page } from "../../components/MarketplaceUi.jsx";
+import { Icon } from "../../components/Icon.jsx";
 
 export function SellerTrust({ sellerId }) {
   const [seller, setSeller] = useState(),
@@ -42,7 +43,7 @@ export function SellerTrust({ sellerId }) {
           </Link>
         )}
         <p>
-          ★ {score?.averageRating || "Chưa có đánh giá"} ·{" "}
+          <Icon name="star" size={16} /> {score?.averageRating || "Chưa có đánh giá"} ·{" "}
           {score?.reviewCount || 0} đánh giá
         </p>
         <small>

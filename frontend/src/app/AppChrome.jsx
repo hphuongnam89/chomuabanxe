@@ -9,13 +9,14 @@ import {
 import { hasSession, logout, me, notifications } from "../api.js";
 import { useCatalog } from "../catalog.js";
 import { EmptyState, Page } from "../components/MarketplaceUi.jsx";
+import { Icon } from "../components/Icon.jsx";
 
 const nav = [
-  ["/", "Trang chủ"],
-  ["/tim-kiem", "Tìm kiếm"],
-  ["/chat", "Chat"],
-  ["/thong-bao", "Thông báo"],
-  ["/ho-so", "Tôi"],
+  ["/", "Trang chủ", "home"],
+  ["/tim-kiem", "Tìm kiếm", "search"],
+  ["/chat", "Chat", "message"],
+  ["/thong-bao", "Thông báo", "bell"],
+  ["/ho-so", "Tôi", "user"],
 ];
 const quickCategories = [
   ["Sedan", 21],
@@ -149,49 +150,51 @@ export function Shell({ children }) {
       <a className="skip-link" href="#main-content">
         Bỏ qua điều hướng
       </a>
-      <header>
+      <header className="site-header">
         <Link className="brand" to="/">
           CARX
         </Link>
-        <details className="area-picker">
-          <summary className="location">⌖ Khu vực</summary>
-          <div className="area-menu" role="menu">
-            <Link to="/tim-kiem">Tất cả khu vực</Link>
-            {catalog.provinces.map((location) => (
-              <Link
-                to={`/tim-kiem?locationId=${location.id}`}
-                key={location.id}
-              >
-                {location.label}
-              </Link>
-            ))}
-          </div>
-        </details>
-        <form className="searchbox" onSubmit={submitSearch}>
-          <input
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="Tìm xe..."
-            aria-label="Tìm xe"
-          />
-          <button type="submit" aria-label="Tìm kiếm">
-            ⌕
-          </button>
-        </form>
+        <div className="header-search">
+          <details className="area-picker">
+            <summary className="location"><Icon name="mapPin" size={18} /> Khu vực</summary>
+            <div className="area-menu" role="menu">
+              <Link to="/tim-kiem">Tất cả khu vực</Link>
+              {catalog.provinces.map((location) => (
+                <Link
+                  to={`/tim-kiem?locationId=${location.id}`}
+                  key={location.id}
+                >
+                  {location.label}
+                </Link>
+              ))}
+            </div>
+          </details>
+          <form className="searchbox" onSubmit={submitSearch}>
+            <input
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="Tìm hãng, mẫu xe hoặc khu vực"
+              aria-label="Tìm xe"
+            />
+            <button type="submit" aria-label="Tìm kiếm">
+              <Icon name="search" size={19} />
+            </button>
+          </form>
+        </div>
         <nav className="desktop-nav" aria-label="Điều hướng chính">
-          <Link to="/chat">Chat</Link>
-          <Link to="/thong-bao">Thông báo{unread ? ` (${unread})` : ""}</Link>
+          <Link to="/chat"><span className="nav-link-content"><Icon name="message" size={17} /> Chat</span></Link>
+          <Link to="/thong-bao"><span className="nav-link-content"><Icon name="bell" size={17} /> Thông báo{unread ? ` (${unread})` : ""}</span></Link>
           {user ? (
             <>
               <Link className="user-link" to="/ho-so">
-                {user.displayName}
+                <Icon name="user" size={17} /> {user.displayName}
               </Link>
               <button
                 type="button"
                 className="secondary logout"
                 onClick={logout}
               >
-                Đăng xuất
+                <Icon name="logOut" size={17} /> Đăng xuất
               </button>
             </>
           ) : (
@@ -200,7 +203,7 @@ export function Shell({ children }) {
             </Link>
           )}
           <Link className="primary" to="/dang-tin">
-            ＋ Đăng tin
+            <Icon name="plus" size={18} /> Đăng tin
           </Link>
         </nav>
       </header>
@@ -219,7 +222,7 @@ export function Shell({ children }) {
               CARX
             </Link>
             <p>Mua bán xe rõ ràng, minh bạch và gần bạn.</p>
-            <Link className="primary" to="/dang-tin">
+          <Link className="primary" to="/dang-tin">
               Đăng tin miễn phí
             </Link>
           </section>
@@ -245,13 +248,14 @@ export function Shell({ children }) {
         </div>
       </footer>
       <nav className="mobile-nav" aria-label="Điều hướng di động">
-        {nav.map(([to, label]) => (
+        {nav.map(([to, label, icon]) => (
           <NavLink to={to} key={to}>
-            {label}
+            <Icon name={icon} size={18} />
+            <span>{label}</span>
           </NavLink>
         ))}
         <NavLink className="post-fab" to="/dang-tin" aria-label="Đăng tin">
-          ＋
+          <Icon name="plus" size={24} />
         </NavLink>
       </nav>
     </>

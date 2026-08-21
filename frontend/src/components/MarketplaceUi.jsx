@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { Icon } from "./Icon.jsx";
 
 export const timeAgo = (value) => {
   const minutes = Math.max(
@@ -54,7 +55,7 @@ export function ListingSkeleton() {
 export function EmptyState({ title, children, action }) {
   return (
     <div className="empty-state panel">
-      <div aria-hidden="true">⌕</div>
+      <Icon name="search" size={30} />
       <b>{title}</b>
       {children && <p>{children}</p>}
       {action}
@@ -83,28 +84,28 @@ export function Page({ title, children }) {
 }
 
 const categoryIcons = {
-  21: "🚘",
-  22: "🚙",
-  23: "🚗",
-  24: "🚐",
-  25: "🛻",
-  26: "🏎️",
-  27: "🌤️",
-  28: "⚡",
-  29: "✨",
-  30: "🚘",
+  21: "car",
+  22: "car",
+  23: "car",
+  24: "car",
+  25: "car",
+  26: "car",
+  27: "car",
+  28: "car",
+  29: "car",
+  30: "car",
 };
 export const visual = (item) =>
   item.coverImageUrl ? (
-    <img
-      src={item.coverImageUrl}
-      alt=""
+      <img
+        src={item.coverImageUrl}
+        alt={`Ảnh xe ${item.title}`}
       loading="lazy"
       decoding="async"
       style={{ width: "100%", height: "100%", objectFit: "cover" }}
     />
   ) : (
-    categoryIcons[item.categoryId] || "📦"
+    <Icon name={categoryIcons[item.categoryId] || "package"} size={42} />
   );
 export const conditions = {
   1: "Mới",

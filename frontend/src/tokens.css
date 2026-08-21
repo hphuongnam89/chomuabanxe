@@ -1,0 +1,47 @@
+:root {
+  --color-accent: #f4511e;
+  --color-accent-strong: #c9360b;
+  --color-accent-soft: #fff1eb;
+  --color-ink: #18181b;
+  --color-muted: #71717a;
+  --color-border: #e4e4e7;
+  --color-surface: #ffffff;
+  --color-canvas: #f7f7f8;
+  --color-focus: rgba(244, 81, 30, 0.32);
+  --orange: var(--color-accent);
+  --orange-dark: var(--color-accent-strong);
+  --orange-soft: var(--color-accent-soft);
+  --ink: var(--color-ink);
+  --muted: var(--color-muted);
+  --line: var(--color-border);
+  --surface: var(--color-surface);
+  --canvas: var(--color-canvas);
+  --font-body: Inter, "Avenir Next", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Avenir Next", Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: clamp(1.5rem, 2.1vw, 2rem);
+  --text-display: clamp(2.5rem, 4.1vw, 3.875rem);
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --radius-sm: 0.625rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --shadow-soft: 0 8px 30px rgba(24, 24, 27, 0.07);
+  --shadow-lift: 0 12px 28px rgba(154, 52, 18, 0.09);
+  --motion-fast: 180ms;
+  --motion-normal: 240ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --radius: var(--radius-lg);
+  --shadow: var(--shadow-soft);
+}

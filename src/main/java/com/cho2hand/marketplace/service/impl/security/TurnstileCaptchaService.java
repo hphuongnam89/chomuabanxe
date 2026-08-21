@@ -16,14 +16,17 @@ public class TurnstileCaptchaService implements CaptchaService {
     private static final URI VERIFY_URL = URI.create("https://challenges.cloudflare.com/turnstile/v0/siteverify");
     private final HttpClient client = HttpClient.newHttpClient();
     private final String secretKey;
+    private final boolean required;
 
-    public TurnstileCaptchaService(@Value("${app.captcha.turnstile-secret-key:}") String secretKey) {
+    public TurnstileCaptchaService(@Value("${app.captcha.turnstile-secret-key:}") String secretKey,
+                                   @Value("${app.captcha.required:false}") boolean required) {
         this.secretKey = secretKey;
+        this.required = required;
     }
 
     @Override
     public void verify(String token) {
-        if (secretKey == null || secretKey.isBlank()) return;
+        if (!required || secretKey == null || secretKey.isBlank()) return;
         if (token == null || token.isBlank()) throw new CaptchaVerificationException();
         try {
             var body = "secret=" + encode(secretKey) + "&response=" + encode(token);

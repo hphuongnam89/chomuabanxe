@@ -27,6 +27,7 @@ import {
   vehicleModels,
 } from "./api.js";
 import AdminConsole from "./AdminConsole.jsx";
+import { Icon } from "./components/Icon.jsx";
 import {
   AdminOnly,
   AppErrorBoundary,
@@ -146,7 +147,7 @@ function Home() {
               Tìm xe
             </Link>
             <Link className="hero-link" to="/dang-tin">
-              Đăng tin miễn phí →
+              Đăng tin miễn phí <Icon name="arrowRight" size={17} />
             </Link>
           </div>
         </div>
@@ -171,11 +172,21 @@ function Home() {
           </div>
           <Link to="/tim-kiem">Xem tất cả</Link>
         </div>
-        <div className="category-grid">
+        <div className="brand-grid">
           {catalog.vehicle.brands.slice(0, 6).map((brand) => (
-            <Link to={`/tim-kiem?brandId=${brand.id}`} key={brand.id}>
-              <span>🚘</span>
-              {brand.name}
+            <Link
+              className="brand-card"
+              to={`/tim-kiem?brandId=${brand.id}`}
+              key={brand.id}
+            >
+              <span className="brand-mark" aria-hidden="true">
+                {brand.name.slice(0, 2).toUpperCase()}
+              </span>
+              <span className="brand-card-copy">
+                <strong>{brand.name}</strong>
+                <small>Khám phá dòng xe</small>
+              </span>
+              <Icon name="arrowRight" size={17} />
             </Link>
           ))}
         </div>
@@ -463,9 +474,9 @@ function Post() {
         },
         captchaToken: window.turnstile?.getResponse?.(),
       });
-      await Promise.all(
-        newFiles.map((image) => uploadImage(listingItem.id, image.file)),
-      );
+      for (const image of newFiles) {
+        await uploadImage(listingItem.id, image.file);
+      }
       navigate(`/tin/${listingItem.id}`);
     } catch (error) {
       if (listingItem?.id) archiveListing(listingItem.id).catch(() => {});
@@ -509,7 +520,7 @@ function Post() {
             </div>
           )}
           <label className="upload">
-            ＋ Thêm ảnh
+            <Icon name="imagePlus" size={20} /> Thêm ảnh
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
@@ -616,7 +627,9 @@ function EditPost({ adminMode = false }) {
       await (adminMode ? adminUpdateListing(id, payload) : updateListing(id, payload));
       if (!adminMode) {
         await Promise.all(removed.map((mediaId) => deleteImage(id, mediaId)));
-        await Promise.all(newFiles.map((item) => uploadImage(id, item.file)));
+        for (const item of newFiles) {
+          await uploadImage(id, item.file);
+        }
       }
       navigate(adminMode ? "/admin" : `/tin/${id}`);
     } catch (error) {
@@ -687,7 +700,7 @@ function EditPost({ adminMode = false }) {
             </div>
           )}
           <label className="upload">
-            ＋ Thêm hoặc thay ảnh
+            <Icon name="imagePlus" size={20} /> Thêm hoặc thay ảnh
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"

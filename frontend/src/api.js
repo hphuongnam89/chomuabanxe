@@ -2,12 +2,14 @@ const SESSION_KEY = "carx-session";
 const LEGACY_SESSION_KEY = "oldmarket-session";
 let csrf;
 export const markSession = () => {
+  csrf = undefined;
   sessionStorage.setItem(SESSION_KEY, "1");
   sessionStorage.removeItem(LEGACY_SESSION_KEY);
 };
 export const hasSession = () =>
-  [SESSION_KEY, LEGACY_SESSION_KEY].some((key) => sessionStorage.getItem(key) === "1");
+  sessionStorage.getItem(SESSION_KEY) === "1";
 export const logout = () => {
+  csrf = undefined;
   sessionStorage.removeItem(SESSION_KEY);
   sessionStorage.removeItem(LEGACY_SESSION_KEY);
   request("/api/v1/auth/logout", { method: "POST" }).catch(() => {});
@@ -30,7 +32,7 @@ async function csrfHeaders() {
   }
   return { [csrf.headerName]: csrf.token };
 }
-async function request(path, options = {}) {
+async function request(path, options = {}, retryCsrf = true) {
   const { timeout = 15000, ...fetchOptions } = options,
     controller = new AbortController(),
     timer = setTimeout(() => controller.abort(), timeout),
@@ -52,6 +54,10 @@ async function request(path, options = {}) {
       },
     });
     if (!response.ok) {
+      if (response.status === 403 && retryCsrf && !["GET", "HEAD", "OPTIONS"].includes(method)) {
+        csrf = undefined;
+        return request(path, options, false);
+      }
       const body = await response.json().catch(() => null);
       if (
         response.status === 401 ||

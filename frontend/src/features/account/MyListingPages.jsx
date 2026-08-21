@@ -8,6 +8,7 @@ import {
   unsaveListing,
 } from "../../api.js";
 import { useCatalog } from "../../catalog.js";
+import { Icon } from "../../components/Icon.jsx";
 import {
   EmptyState,
   ListingCard,
@@ -41,7 +42,7 @@ export function MyPosts() {
       <div className="page-toolbar">
         <p>{items.length} tin đang hiển thị</p>
         <Link className="primary" to="/dang-tin">
-          ＋ Đăng tin
+          <Icon name="plus" size={18} /> Đăng tin
         </Link>
       </div>
       {error && <p className="error">{error}</p>}

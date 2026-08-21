@@ -30,6 +30,7 @@ import {
   adminHealth,
   adminUpdateUserRoles,
 } from "./api.js";
+import { Icon } from "./components/Icon.jsx";
 
 const MANAGED_ROLES = ["ADMIN", "STAFF_CUSTOMER", "STAFF_CONTENT"];
 const ROLE_LABELS = {
@@ -282,17 +283,17 @@ export default function AdminConsole({ roles = [] }) {
     (item) => item.status === "OPEN",
   );
   const navigationItems = [
-    ["overview", "Tổng quan", "⌂"],
+    ["overview", "Tổng quan", <Icon name="chart" size={16} />],
     ["users", "Người dùng", stats?.totalUsers ?? "—"],
     ["listings", "Tin đăng", stats?.totalListings ?? "—"],
     ["reports", "Báo cáo", stats?.openReports ?? "—"],
-    ["categories", "Danh mục", "⌘"],
-    ["vehicle-catalog", "Catalog xe", "🚘"],
-    ["locations", "Khu vực", "⌖"],
+    ["categories", "Danh mục", <Icon name="grid" size={16} />],
+    ["vehicle-catalog", "Catalog xe", <Icon name="car" size={16} />],
+    ["locations", "Khu vực", <Icon name="mapPin" size={16} />],
     ["transactions", "Giao dịch", operations?.transactions ?? "—"],
     ["reviews", "Đánh giá", operations?.reviews ?? "—"],
-    ["notifications", "Thông báo", "＋"],
-    ["security", "Vận hành & bảo mật", "◉"],
+    ["notifications", "Thông báo", <Icon name="bell" size={16} />],
+    ["security", "Vận hành & bảo mật", <Icon name="shield" size={16} />],
   ].map(([id, label, badge]) => ({
     id,
     label,
@@ -307,7 +308,7 @@ export default function AdminConsole({ roles = [] }) {
           <span>CARX OPS</span>
           <h1>Trung tâm quản trị</h1>
         </div>
-        <Link to="/">← Về trang bán hàng</Link>
+        <Link to="/"><Icon name="arrowLeft" size={17} /> Về trang bán hàng</Link>
       </header>
       <div className="admin-workspace">
         <AdminNavigation

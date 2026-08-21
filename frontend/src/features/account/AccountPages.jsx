@@ -14,6 +14,7 @@ import {
   Page,
   timeAgo,
 } from "../../components/MarketplaceUi.jsx";
+import { Icon } from "../../components/Icon.jsx";
 
 export function Profile() {
   const [user, setUser] = useState(),
@@ -65,16 +66,16 @@ export function Profile() {
       )}
       <div className="account-menu">
         <Link to="/tin-cua-toi">
-          ▦ Quản lý tin đăng <span>›</span>
+          <span className="account-menu-label"><Icon name="list" size={18} /> Quản lý tin đăng</span><Icon name="chevronRight" size={16} />
         </Link>
         <Link to="/tin-da-luu">
-          ♡ Tin đã lưu <span>›</span>
+          <span className="account-menu-label"><Icon name="heart" size={18} /> Tin đã lưu</span><Icon name="chevronRight" size={16} />
         </Link>
         <Link to="/danh-gia">
-          ★ Giao dịch & đánh giá <span>›</span>
+          <span className="account-menu-label"><Icon name="star" size={18} /> Giao dịch & đánh giá</span><Icon name="chevronRight" size={16} />
         </Link>
         <Link to="/cai-dat">
-          ⚙ Cài đặt tài khoản <span>›</span>
+          <span className="account-menu-label"><Icon name="settings" size={18} /> Cài đặt tài khoản</span><Icon name="chevronRight" size={16} />
         </Link>
       </div>
     </Page>
@@ -170,16 +171,16 @@ export function Settings() {
           <div className="settings-layout">
             <aside className="account-menu">
               <Link to="/tin-cua-toi">
-                ▦ Quản lý tin đăng <span>›</span>
+                <span className="account-menu-label"><Icon name="list" size={18} /> Quản lý tin đăng</span><Icon name="chevronRight" size={16} />
               </Link>
               <Link to="/tin-da-luu">
-                ♡ Tin đã lưu <span>›</span>
+                <span className="account-menu-label"><Icon name="heart" size={18} /> Tin đã lưu</span><Icon name="chevronRight" size={16} />
               </Link>
               <Link to="/danh-gia">
-                ★ Giao dịch & đánh giá <span>›</span>
+                <span className="account-menu-label"><Icon name="star" size={18} /> Giao dịch & đánh giá</span><Icon name="chevronRight" size={16} />
               </Link>
               <Link to="/chat">
-                💬 Tin nhắn <span>›</span>
+                <span className="account-menu-label"><Icon name="message" size={18} /> Tin nhắn</span><Icon name="chevronRight" size={16} />
               </Link>
             </aside>
             <div className="settings-forms">
@@ -300,7 +301,7 @@ export function Notifications() {
                 <b>{item.body}</b>
                 <small>{timeAgo(item.createdAt)}</small>
               </span>
-              <i>›</i>
+              <Icon name="chevronRight" size={16} />
             </button>
           ))}
         </div>

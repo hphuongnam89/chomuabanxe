@@ -5,6 +5,7 @@ import {
   adminRestoreReview,
   adminSendNotification,
 } from "../api.js";
+import { Icon } from "../components/Icon.jsx";
 import { Pager, Toolbar, date } from "./AdminShared.jsx";
 
 export function Transactions({ data, stats, status, setStatus, search, page }) {
@@ -114,9 +115,15 @@ export function Reviews({ data, status, setStatus, search, reload, setError }) {
               {data?.content?.map((item) => (
                 <tr key={item.id}>
                   <td>
-                    <b>
-                      {"★".repeat(item.rating)}
-                      {"☆".repeat(5 - item.rating)}
+                    <b className="rating-icons" aria-label={`${item.rating} trên 5 sao`}>
+                      {Array.from({ length: 5 }, (_, index) => (
+                        <Icon
+                          key={index}
+                          name="star"
+                          size={14}
+                          className={index < item.rating ? "is-filled" : "is-muted"}
+                        />
+                      ))}
                     </b>
                     <small>
                       #{item.id} · GD #{item.transactionId}

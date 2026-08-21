@@ -57,11 +57,17 @@ public class AuthController {
 
     private AuthResponse issue(AuthResponse auth, HttpServletResponse response) {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie(auth.accessToken(), Duration.ofHours(1)).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, legacyCookie(Duration.ZERO).toString());
         return auth;
     }
 
     private ResponseCookie cookie(String value, Duration maxAge) {
         return ResponseCookie.from(COOKIE_NAME, value).httpOnly(true).secure(cookieSecure)
+                .sameSite("Lax").path("/").maxAge(maxAge).build();
+    }
+
+    private ResponseCookie legacyCookie(Duration maxAge) {
+        return ResponseCookie.from("OLDMARKET_TOKEN", "").httpOnly(true).secure(cookieSecure)
                 .sameSite("Lax").path("/").maxAge(maxAge).build();
     }
 

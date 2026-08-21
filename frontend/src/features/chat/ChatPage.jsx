@@ -15,6 +15,7 @@ import {
   timeAgo,
   visual,
 } from "../../components/MarketplaceUi.jsx";
+import { Icon } from "../../components/Icon.jsx";
 
 export default function Chat() {
   const [query] = useSearchParams(),
@@ -160,7 +161,7 @@ export default function Chat() {
                     to={`/tin/${thread.listingId}`}
                   >
                     <span className="chat-thumb">
-                      {threadListing ? visual(threadListing) : "📦"}
+                      {threadListing ? visual(threadListing) : <Icon name="package" size={24} />}
                     </span>
                     <span>
                       <b>

@@ -28,6 +28,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         var cookie = ResponseCookie.from("CARX_TOKEN", auth.accessToken()).httpOnly(true).secure(cookieSecure)
                 .sameSite("Lax").path("/").maxAge(Duration.ofHours(1)).build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, ResponseCookie.from("OLDMARKET_TOKEN", "").httpOnly(true)
+                .secure(cookieSecure).sameSite("Lax").path("/").maxAge(Duration.ZERO).build().toString());
         getRedirectStrategy().sendRedirect(request, response, "/oauth-success");
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -28,6 +29,7 @@ class AuthControllerTest {
                         .content("{\"email\":\"minh@example.com\",\"password\":\"password123\"}"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Set-Cookie", containsString("CARX_TOKEN=jwt")))
+                .andExpect(header().stringValues("Set-Cookie", hasItem(containsString("OLDMARKET_TOKEN="))))
                 .andExpect(header().string("Set-Cookie", containsString("HttpOnly")))
                 .andExpect(header().string("Set-Cookie", containsString("SameSite=Lax")))
                 .andExpect(jsonPath("$.accessToken").doesNotExist())

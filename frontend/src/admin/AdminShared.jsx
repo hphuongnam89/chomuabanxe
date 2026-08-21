@@ -100,7 +100,8 @@ export function AdminNavigation({ activeTab, items, onSelect }) {
             key={item.id}
             onClick={() => onSelect(item.id)}
           >
-            {item.label} <span>{item.badge}</span>
+            <span className="admin-nav-label">{item.badge?.type ? item.badge : null}{item.label}</span>
+            <span>{item.badge?.type ? null : item.badge}</span>
           </button>
         ))}
     </aside>

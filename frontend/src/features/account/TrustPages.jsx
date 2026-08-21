@@ -94,11 +94,11 @@ export function Reviews() {
                 <label>
                   Đánh giá người bán
                   <select name="rating" defaultValue="5">
-                    <option value="5">★★★★★ Rất tốt</option>
-                    <option value="4">★★★★ Tốt</option>
-                    <option value="3">★★★ Bình thường</option>
-                    <option value="2">★★ Cần cải thiện</option>
-                    <option value="1">★ Không hài lòng</option>
+                    <option value="5">5 — Rất tốt</option>
+                    <option value="4">4 — Tốt</option>
+                    <option value="3">3 — Bình thường</option>
+                    <option value="2">2 — Cần cải thiện</option>
+                    <option value="1">1 — Không hài lòng</option>
                   </select>
                 </label>
                 <textarea

@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 public interface ListingImageRepository extends JpaRepository<ListingImage,ListingImageId>{
  long countByIdListingId(Long id);
+ @Query("select coalesce(max(image.sortOrder), -1) + 1 from ListingImage image where image.id.listingId = :listingId")
+ int nextSortOrder(@Param("listingId") Long listingId);
  List<ListingImage> findByIdListingIdOrderBySortOrderAsc(Long id);
  @Query("select image from ListingImage image where image.id.listingId in :listingIds and image.sortOrder=(select min(candidate.sortOrder) from ListingImage candidate where candidate.id.listingId=image.id.listingId)")
  List<ListingImage> findCoverImagesByListingIds(@Param("listingIds") Collection<Long> listingIds);
