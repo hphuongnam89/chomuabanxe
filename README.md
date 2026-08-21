@@ -131,12 +131,3 @@ for file in $(ls src/main/resources/db/migration/V*.sql | sort -V); do
   mysql carx_verify < "$file" || exit 1
 done
 ```
-
-## Tài liệu dự án
-
-- [Thiết kế Phase 0](docs/carx/PHASE_0_DESIGN.md)
-- [Customer frontend Phase 2](docs/carx/PHASE_2_CUSTOMER_FRONTEND.md)
-- [Admin và RBAC Phase 3](docs/carx/PHASE_3_ADMIN.md)
-- [Tích hợp dữ liệu và vận hành Phase 4](docs/carx/PHASE_4_INTEGRATION.md)
-- [Kiểm thử và hardening Phase 5](docs/carx/PHASE_5_VERIFICATION.md)
-- [Release readiness Phase 6](docs/carx/PHASE_6_RELEASE_READINESS.md)
