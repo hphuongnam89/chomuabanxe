@@ -21,8 +21,12 @@ public class JwtTokenProvider {
     }
 
     public String generate(Long userId, List<String> roles) {
+        return generate(userId, roles, 0L);
+    }
+
+    public String generate(Long userId, List<String> roles, long authTokenVersion) {
         var now = Instant.now();
-        return Jwts.builder().subject(userId.toString()).claim("roles", roles)
+        return Jwts.builder().subject(userId.toString()).claim("roles", roles).claim("auth_ver", authTokenVersion)
                 .issuedAt(Date.from(now)).expiration(Date.from(now.plusSeconds(properties.expirationMinutes() * 60)))
                 .signWith(signingKey).compact();
     }

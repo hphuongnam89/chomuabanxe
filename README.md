@@ -116,6 +116,7 @@ Catalog admin chỉ nhận các resource: `brands`, `models`, `origins`, `transm
 - V25-V27: permissions, role mapping và RBAC.
 - V28: danh mục CarX; danh mục cũ được giữ lại để không phá khóa ngoại nhưng không còn hiển thị.
 - V29-V30: đồng bộ kiểu năm sản xuất và số chỗ trong `vehicle_specs` với entity Java khi Hibernate validate schema.
+- V31: thêm phiên bản token xác thực để thu hồi các JWT cũ khi logout hoặc đổi mật khẩu.
 
 Seed catalog gồm các hãng phổ biến, mẫu xe, nhiên liệu, hộp số, xuất xứ, màu, kiểu dáng và dẫn động. Listing mới luôn phải có `vehicle_specs` hợp lệ.
 

@@ -39,6 +39,9 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @Column(name = "auth_token_version", nullable = false)
+    private long authTokenVersion;
+
     @PrePersist
     void createTimestamps() {
         var now = Instant.now();
@@ -62,4 +65,6 @@ public class User {
     public void setLastActiveAt(Instant lastActiveAt) { this.lastActiveAt = lastActiveAt; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
+    public long getAuthTokenVersion() { return authTokenVersion; }
+    public void revokeTokens() { authTokenVersion++; }
 }

@@ -49,7 +49,8 @@ public class AuthController {
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(HttpServletResponse response) {
+    public void logout(@AuthenticationPrincipal Long userId, HttpServletResponse response) {
+        authService.revokeSessions(userId);
         response.addHeader(HttpHeaders.SET_COOKIE, cookie("", Duration.ZERO).toString());
         response.addHeader(HttpHeaders.SET_COOKIE, ResponseCookie.from("OLDMARKET_TOKEN", "").httpOnly(true)
                 .secure(cookieSecure).sameSite("Lax").path("/").maxAge(Duration.ZERO).build().toString());

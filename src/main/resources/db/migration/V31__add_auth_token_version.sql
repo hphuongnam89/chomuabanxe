@@ -1,0 +1,2 @@
+ALTER TABLE users
+    ADD COLUMN auth_token_version BIGINT UNSIGNED NOT NULL DEFAULT 0;

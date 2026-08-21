@@ -152,6 +152,7 @@ public class AuthServiceImpl implements AuthService {
         var identity = identityRepository.findById(token.getIdentityId()).orElseThrow(InvalidResetTokenException::new);
         identity.setPasswordHash(passwordEncoder.encode(request.newPassword()));
         token.setUsedAt(Instant.now());
+        userRepository.findById(identity.getUserId()).ifPresent(User::revokeTokens);
     }
 
     @Override
@@ -159,10 +160,16 @@ public class AuthServiceImpl implements AuthService {
         var identity = identityRepository.findByUserIdAndIdentityType(userId, EMAIL).orElseThrow(AuthenticationFailedException::new);
         if (!passwordEncoder.matches(request.currentPassword(), identity.getPasswordHash())) throw new AuthenticationFailedException();
         identity.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        userRepository.findById(userId).ifPresent(User::revokeTokens);
+    }
+
+    @Override
+    public void revokeSessions(Long userId) {
+        if (userId != null) userRepository.findById(userId).ifPresent(User::revokeTokens);
     }
 
     private AuthResponse response(User user, List<String> roles) {
-        return authMapper.toResponse(user, tokenProvider.generate(user.getId(), roles), roles);
+        return authMapper.toResponse(user, tokenProvider.generate(user.getId(), roles, user.getAuthTokenVersion()), roles);
     }
 
     private UserAuthIdentity findIdentity(String email) {

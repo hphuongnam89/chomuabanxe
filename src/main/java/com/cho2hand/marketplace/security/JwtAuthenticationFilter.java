@@ -46,7 +46,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 Claims claims = tokenProvider.parse(token);
                 var userId = Long.valueOf(claims.getSubject());
-                if (users.findById(userId).filter(user -> user.getUserStatusId() == 1L).isEmpty()) {
+                var claimVersion = claims.get("auth_ver");
+                var tokenVersion = claimVersion == null ? 0L : Long.parseLong(claimVersion.toString());
+                if (users.findById(userId).filter(user -> user.getUserStatusId() == 1L
+                        && user.getAuthTokenVersion() == tokenVersion).isEmpty()) {
                     SecurityContextHolder.clearContext();
                     chain.doFilter(request, response);
                     return;

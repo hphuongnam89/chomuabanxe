@@ -47,7 +47,7 @@ class AuthServiceImplTest {
         when(users.findById(7L)).thenReturn(Optional.of(user));
         when(statuses.findByCodeAndActiveTrue("ACTIVE")).thenReturn(Optional.of(active));
         when(roles.findRoleCodesByUserId(7L)).thenReturn(List.of("USER"));
-        when(jwt.generate(7L, List.of("USER"))).thenReturn("jwt");
+        when(jwt.generate(7L, List.of("USER"), 0L)).thenReturn("jwt");
 
         var service = new AuthServiceImpl(users, identities, statuses, mock(RoleRepository.class), roles,
                 mock(PasswordResetTokenRepository.class), encoder, jwt, new AuthMapper(), mock(CaptchaService.class));
